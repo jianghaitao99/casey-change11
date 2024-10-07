@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>www.caseyapkallapk.com - 软件上传下载平台</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: white;
+            color: #333;
+        }
+        .nav-link {
+            color: #333;
+            transition: color 0.3s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #0066cc;
+        }
+        #uploadProgress {
+            display: none;
+        }
+        .social-links img {
+            width: 24px;
+            height: 24px;
+            margin: 0 5px;
+        }
+        /* 添加隐藏空间背景样式 */
+        .hidden-space-background {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" opacity="0.1"><text x="50%" y="50%" font-family="Arial" font-size="20" fill="red" text-anchor="middle" dominant-baseline="middle" transform="rotate(-45 100 100)">禁止泄露!</text></svg>');
+            background-repeat: repeat;
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-light py-3">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="logo d-flex align-items-center">
+                    <span class="h3 me-2 text-primary fw-bold">CASEY</span>
+                    <span>www.caseyapkallapk.com</span>
+                </div>
+                <nav class="d-flex align-items-center">
+                    <ul class="nav me-3">
+                        <li class="nav-item"><a href="#home" class="nav-link active" data-bs-toggle="tab" data-translate="home">首页</a></li>
+                        <li class="nav-item"><a href="#upload" class="nav-link" data-bs-toggle="tab" data-translate="upload">上传软件</a></li>
+                        <li class="nav-item"><a href="#download" class="nav-link" data-bs-toggle="tab" data-translate="download">下载软件</a></li>
+                    </ul>
+                    <div class="dropdown">
+                        <button class="btn btn-link dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-translate"></i>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                            <li><a class="dropdown-item" href="#" data-lang="zh">简体中文</a></li>
+                            <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container my-4">
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="home">
+                <h2>欢迎来到软件上传下载平台</h2>
+                <p>这里是我们平台的首页，您可以在这里了解我们的服务和最新动态。</p>
+            </div>
+            <div class="tab-pane fade" id="upload">
+                <h2>上传软件</h2>
+                <div class="mb-3">
+                    <input type="password" id="uploadPassword" class="form-control" placeholder="请输入上传密码">
+                </div>
+                <input type="file" id="fileInput" style="display: none;" accept=".exe,.dmg,.zip">
+                <button id="uploadBtn" class="btn btn-primary">选择文件上传</button>
+                <p class="mt-2">支持的文件格式：.exe, .dmg, .zip 等，最大上传大小：500MB</p>
+                <div id="uploadProgress" class="mt-3" style="display: none;">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                </div>
+                <p id="selectedFileName" class="mt-2"></p>
+            </div>
+            <div class="tab-pane fade" id="download">
+                <h2>下载软件</h2>
+                <input type="search" id="searchSoftware" class="form-control mb-3" placeholder="搜索软件...">
+                <div id="softwareList"></div>
+                <div id="hiddenSoftwareList" style="display: none;"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-light text-center py-3 mt-4">
+        <p>&copy; 2024 www.caseyapkallapk.com. All Rights Reserved.</p>
+        <div class="social-links">
+            <a href="#" target="_blank"><img src="https://via.placeholder.com/24" alt="Facebook"></a>
+            <a href="#" target="_blank"><img src="https://via.placeholder.com/24" alt="Twitter"></a>
+            <a href="#" target="_blank"><img src="https://via.placeholder.com/24" alt="LinkedIn"></a>
+        </div>
+        <div class="mt-2">
+            <a href="#privacy" class="text-muted text-decoration-none">隐私政策</a> | 
+            <a href="#terms" class="text-muted text-decoration-none">用户协议</a>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM fully loaded and parsed');
+
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInput = document.getElementById('fileInput');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const progressBar = uploadProgress.querySelector('.progress-bar');
+        const selectedFileName = document.getElementById('selectedFileName');
+        const uploadPassword = document.getElementById('uploadPassword');
+        const softwareListElement = document.getElementById('softwareList');
+        const searchSoftware = document.getElementById('searchSoftware');
+        const hiddenSoftwareListElement = document.getElementById('hiddenSoftwareList');
+
+        console.log('Elements:', {
+            uploadBtn, fileInput, uploadProgress, progressBar, selectedFileName,
+            uploadPassword, softwareListElement, searchSoftware, hiddenSoftwareListElement
+        });
+
+        // 从 localStorage 加载软件列表
+        let softwareList = JSON.parse(localStorage.getItem('softwareList')) || [
+            { name: '示例软件1', description: '这是一个示例软件', size: '10MB', date: '2024-03-01', downloads: '无限' },
+            { name: '示例软件2', description: '另一个示例软件', size: '20MB', date: '2024-03-02', downloads: '无限' },
+        ];
+
+        // 从 localStorage 加载隐藏软件列表
+        let hiddenSoftwareList = JSON.parse(localStorage.getItem('hiddenSoftwareList')) || [];
+
+        console.log('Initial software lists:', { softwareList, hiddenSoftwareList });
+
+        let isPasswordVerified = false;
+
+        uploadBtn.addEventListener('click', function() {
+            if (isPasswordVerified || uploadPassword.value === 'casey38715') {
+                isPasswordVerified = true;
+                uploadPassword.value = '';
+                const isHidden = confirm('是否上传到隐藏空间？');
+                fileInput.click();
+                fileInput.onchange = function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        selectedFileName.textContent = `已选择文件: ${file.name}`;
+                        simulateUpload(file, isHidden);
+                    }
+                };
+            } else {
+                alert('密码错误，请输入正确的上传密码。');
+            }
+        });
+
+        function simulateUpload(file, isHidden) {
+            uploadProgress.style.display = 'block';
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = progress + '%';
+                progressBar.setAttribute('aria-valuenow', progress);
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    alert('文件上传成功！' + (isHidden ? '（已上传到隐藏空间）' : ''));
+                    uploadProgress.style.display = 'none';
+                    selectedFileName.textContent = '';
+                    fileInput.value = '';
+                    addSoftwareToList(file, isHidden);
+                }
+            }, 500);
+        }
+
+        function addSoftwareToList(file, isHidden) {
+            const newSoftware = {
+                name: file.name,
+                description: '新上传的软件',
+                size: formatFileSize(file.size),
+                date: new Date().toISOString().split('T')[0],
+                downloads: '无限'
+            };
+            if (isHidden) {
+                hiddenSoftwareList.unshift(newSoftware);
+                localStorage.setItem('hiddenSoftwareList', JSON.stringify(hiddenSoftwareList));
+                console.log('Added to hidden list:', newSoftware);
+                updateHiddenSoftwareList();
+            } else {
+                softwareList.unshift(newSoftware);
+                localStorage.setItem('softwareList', JSON.stringify(softwareList));
+                console.log('Added to normal list:', newSoftware);
+                updateSoftwareList();
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
+            else if (bytes < 1073741824) return (bytes / 1048576).toFixed(2) + ' MB';
+            else return (bytes / 1073741824).toFixed(2) + ' GB';
+        }
+
+        searchSoftware.addEventListener('input', function() {
+            console.log('Search input value:', this.value);
+            if (this.value === '789088') {
+                console.log('Correct password entered');
+                enterHiddenSpace();
+            } else {
+                exitHiddenSpace();
+            }
+        });
+
+        function enterHiddenSpace() {
+            console.log('Entering hidden space');
+            hiddenSoftwareListElement.style.display = 'block';
+            softwareListElement.style.display = 'none';
+            updateHiddenSoftwareList();
+            searchSoftware.value = '';
+            document.body.classList.add('hidden-space-background');
+            console.log('Hidden space entered');
+        }
+
+        function exitHiddenSpace() {
+            console.log('Exiting hidden space');
+            hiddenSoftwareListElement.style.display = 'none';
+            softwareListElement.style.display = 'block';
+            document.body.classList.remove('hidden-space-background');
+            resetPasswordVerification();
+            console.log('Hidden space exited');
+        }
+
+        function updateSoftwareList() {
+            softwareListElement.innerHTML = '';
+            softwareList.forEach((software, index) => {
+                const softwareElement = createSoftwareElement(software, index, false);
+                softwareListElement.appendChild(softwareElement);
+            });
+            console.log('Updated normal software list');
+        }
+
+        function updateHiddenSoftwareList() {
+            hiddenSoftwareListElement.innerHTML = `
+                <div class="mb-3">
+                    <button id="exitHiddenSpace" class="btn btn-warning">退出隐藏空间</button>
+                </div>
+            `;
+            hiddenSoftwareList.forEach((software, index) => {
+                const softwareElement = createSoftwareElement(software, index, true);
+                hiddenSoftwareListElement.appendChild(softwareElement);
+            });
+            document.getElementById('exitHiddenSpace').addEventListener('click', exitHiddenSpace);
+            console.log('Updated hidden software list');
+        }
+
+        function createSoftwareElement(software, index, isHidden) {
+            const softwareElement = document.createElement('div');
+            softwareElement.className = 'card mb-3';
+            softwareElement.innerHTML = `
+                <div class="card-body">
+                    <h3 class="card-title">${software.name}</h3>
+                    <p class="card-text">${software.description}</p>
+                    <p class="card-text"><small class="text-muted">大小: ${software.size} | 上传日期: ${software.date} | 下载次数: 无限</small></p>
+                    <a href="#" class="btn btn-primary download-btn" data-software-name="${software.name}">下载</a>
+                    <button class="btn btn-secondary delete-btn" data-index="${index}">删除</button>
+                </div>
+            `;
+            softwareElement.querySelector('.download-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                simulateDownload(software.name);
+            });
+            softwareElement.querySelector('.delete-btn').addEventListener('click', function() {
+                if (isHidden) {
+                    confirmHiddenDelete(index);
+                } else {
+                    confirmDelete(index);
+                }
+            });
+            return softwareElement;
+        }
+
+        function confirmDelete(index) {
+            if (confirm('确定要删除这个软件吗？')) {
+                if (isPasswordVerified || prompt('请输入删除密码：') === 'casey38715') {
+                    isPasswordVerified = true;
+                    softwareList.splice(index, 1);
+                    localStorage.setItem('softwareList', JSON.stringify(softwareList));
+                    updateSoftwareList();
+                    alert('软件已成功删除。');
+                } else {
+                    alert('密码错误，无法删除软件。');
+                }
+            }
+        }
+
+        function confirmHiddenDelete(index) {
+            if (confirm('确定要删除这个隐藏软件吗？')) {
+                if (isPasswordVerified || prompt('请输入删除密码：') === 'casey38715') {
+                    isPasswordVerified = true;
+                    hiddenSoftwareList.splice(index, 1);
+                    localStorage.setItem('hiddenSoftwareList', JSON.stringify(hiddenSoftwareList));
+                    updateHiddenSoftwareList();
+                    alert('隐藏软件已成功删除。');
+                } else {
+                    alert('密码错误，无法删除软件。');
+                }
+            }
+        }
+
+        function simulateDownload(softwareName) {
+            const blob = new Blob(['这是 ' + softwareName + ' 的模拟内容'], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = softwareName + '.txt';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            alert(`${softwareName} 开始下载。请选择保存位置。`);
+        }
+
+        function resetPasswordVerification() {
+            isPasswordVerified = false;
+        }
+
+        setInterval(resetPasswordVerification, 30 * 60 * 1000);
+
+        updateSoftwareList();
+        console.log('Initial software list updated');
+
+        window.testHiddenSpace = function() {
+            console.log('Testing hidden space functionality');
+            searchSoftware.value = '789088';
+            searchSoftware.dispatchEvent(new Event('input'));
+        }
+
+        console.log('Script fully loaded');
+    });
+    </script>
+</body>
+</html>
